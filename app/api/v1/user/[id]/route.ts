@@ -36,7 +36,7 @@ export async function PATCH(req: Request, { params }: any) {
 
 export async function DELETE(req: Request, { params }: any) {
   try {
-    const authUser = getAuthUser(req);
+    const authUser = await getAuthUser(req);
     if (!authUser) return fail("Unauthorized", 401);
 
     const { id } = await params;
