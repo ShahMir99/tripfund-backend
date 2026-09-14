@@ -32,10 +32,6 @@ export async function getAuthUser(req: Request) {
     (req as any).user = user;
     return user;
   } catch (err: any) {
-    // This is the line that matters most — your current version
-    // swallows this completely, so every failure (bad token, expired
-    // token, DB connection race, wrong secret) looks identical from
-    // the outside: a silent null.
     console.log("[getAuthUser] FAILED:", err?.name, "-", err?.message);
     return null;
   }

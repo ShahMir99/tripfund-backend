@@ -4,6 +4,8 @@ import User from "@/database/schemas/user.schema";
 import { DbConnection } from "@/database/connection";
 import { fail, ok } from "@/libs/response";
 
+import "@/database/schemas";
+
 export async function POST(req: Request) {
   try {
     await DbConnection();

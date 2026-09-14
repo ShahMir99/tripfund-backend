@@ -4,13 +4,35 @@ import { getAuthUser } from "@/middleware/checkAuth";
 import { DbConnection } from "@/database/connection";
 import User from "@/database/schemas/user.schema";
 
+import jwt from "jsonwebtoken";
+
 export async function PATCH(req: Request, { params }: any) {
   try {
-    const authUser = await getAuthUser(req);
+    const authHeader = req.headers.get("authorization") || "";
+    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
-    console.log("authUser", authUser);
+    if (!token) {
+      console.log("[getAuthUser] No Bearer token on request");
+      return null;
+    }
 
-    if (!authUser) return fail("Unauthorized", 401);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      id: string;
+    };
+    console.log("[getAuthUser] Token verified, decoded id:", decoded.id);
+
+    await DbConnection();
+    console.log("[getAuthUser] DB connected, looking up user...");
+
+    const checkUser = await User.findById(decoded.id).select("-password");
+
+    console.log("checkUser", checkUser)
+
+    // const authUser = await getAuthUser(req);
+
+    // console.log("authUser", authUser);
+
+    // if (!authUser) return fail("Unauthorized", 401);
 
     const { id } = await params;
     await DbConnection();
