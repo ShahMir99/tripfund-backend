@@ -27,16 +27,14 @@ export async function POST(req : Request) {
 
     const { password: _pw, ...userData } = user.toObject();
     return ok(userData, 201);
-  } catch (err) {
+  } catch (err : any) {
+    console.log("Error while registering user")
     return fail(err.message, 500);
   }
 }
 
-export async function GET(req) {
+export async function GET(req : Request) {
   try {
-    console.log("Hello")
-    // const authUser = getAuthUser(req);
-    // if (!authUser) return fail("Unauthorized", 401);
 
     await DbConnection();
     const { searchParams } = new URL(req.url);
@@ -53,7 +51,8 @@ export async function GET(req) {
 
     const users = await User.find().select("-password");
     return ok(users);
-  } catch (err) {
+  } catch (err : any) {
+    console.log("Error while getting user profile")
     return fail(err.message, 500);
   }
 }

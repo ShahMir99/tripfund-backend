@@ -1,7 +1,9 @@
-import {fail, ok} from "@/libs/response"
-import { v2 as cloudinary } from "cloudinary";
+import { fail, ok } from "@/libs/response";
+import {
+  v2 as cloudinary,
+  UploadApiResponse,
+} from "cloudinary";
 import { getAuthUser } from "@/middleware/checkAuth";
-
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,7 +11,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function POST(req) {
+export async function POST(req: Request) {
   try {
     const authUser = await getAuthUser(req);
     if (!authUser) return fail("Unauthorized", 401);
@@ -23,21 +25,25 @@ export async function POST(req) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const uploadResult = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "tripfund/avatars", resource_type: "image" },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
-      stream.end(buffer);
-    });
+    const uploadResult = await new Promise<UploadApiResponse>(
+      (resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "tripfund/avatars", resource_type: "image" },
+          (error, result) => {
+            if (error) return reject(error);
+            if (!result) {
+              return reject(new Error("Upload failed — no result returned"));
+            }
+            resolve(result);
+          }
+        );
+        stream.end(buffer);
+      }
+    );
 
     return ok({ url: uploadResult.secure_url });
-  } catch (err) {
-    console.log("error while fetching upload image", err)
-
+  } catch (err: any) {
+    console.log("error while uploading image", err);
     return fail(err.message, 500);
   }
 }
