@@ -1,12 +1,11 @@
 import bcrypt from "bcryptjs";
-import {DbConnection} from "@/database/connection"
-import User from "@/database/schemas/user.schema"
-import {fail, ok} from "@/libs/response"
+import { DbConnection } from "@/database/connection";
+import User from "@/database/schemas/user.schema";
+import { fail, ok } from "@/libs/response";
 
 import "@/database/schemas";
 
-
-export async function POST(req : Request) {
+export async function POST(req: Request) {
   try {
     await DbConnection();
     const { name, email, password } = await req.json();
@@ -27,15 +26,14 @@ export async function POST(req : Request) {
 
     const { password: _pw, ...userData } = user.toObject();
     return ok(userData, 201);
-  } catch (err : any) {
-    console.log("Error while registering user")
+  } catch (err: any) {
+    console.log("Error while registering user");
     return fail(err.message, 500);
   }
 }
 
-export async function GET(req : Request) {
+export async function GET(req: Request) {
   try {
-
     await DbConnection();
     const { searchParams } = new URL(req.url);
     const username = searchParams.get("username");
@@ -43,7 +41,7 @@ export async function GET(req : Request) {
     if (username) {
       const user = await User.findOne({ username }).populate(
         "circles",
-        "name goalAmount currency"
+        "name goalAmount currency",
       );
       if (!user) return fail("User not found", 404);
       return ok(user);
@@ -51,8 +49,8 @@ export async function GET(req : Request) {
 
     const users = await User.find().select("-password");
     return ok(users);
-  } catch (err : any) {
-    console.log("Error while getting user profile")
+  } catch (err: any) {
+    console.log("Error while getting user profile");
     return fail(err.message, 500);
   }
 }
