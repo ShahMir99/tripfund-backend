@@ -8,9 +8,11 @@ export async function PATCH(req: Request, { params }: any) {
   try {
     // ---- inlined getAuthUser logic, for testing ----
     const authHeader = req.headers.get("authorization") || "";
+    console.log("authHeader", authHeader)
     const token = authHeader.startsWith("Bearer ")
-      ? authHeader.slice(7)
-      : null;
+    ? authHeader.slice(7)
+    : null;
+    console.log("token", token)
 
     if (!token) {
       console.log("[inline-auth] No Bearer token on request");
