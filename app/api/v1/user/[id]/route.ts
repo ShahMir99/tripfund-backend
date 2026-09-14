@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 export async function PATCH(req: Request, { params }: any) {
   try {
     // ---- inlined getAuthUser logic, for testing ----
+    console.log("req.headers", req.headers)
     const authHeader = req.headers.get("authorization") || "";
     console.log("authHeader", authHeader)
     const token = authHeader.startsWith("Bearer ")
